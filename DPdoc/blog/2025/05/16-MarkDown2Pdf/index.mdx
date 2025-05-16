@@ -1,0 +1,34 @@
+---
+slug: Markdown2Pdf
+title: Convert multiple Markdown to Pdf
+authors: [Castamere]
+---
+
+# Convert multiple Markdown to Pdf
+
+将多个 Markdown 文件转为 Pdf 文件
+
+{/* truncate */}
+
+```python
+from markdown_pdf import MarkdownPdf
+from markdown_pdf import Section
+import os
+
+files = os.listdir("./File")
+
+if not os.path.exists("./res"):
+    os.mkdir("./res")
+
+for file in files:
+    pdf = MarkdownPdf(toc_level=2, optimize=True)
+    with open("./File/" + file, "r") as f:
+        pdf.add_section(Section(f.read()))
+        pdf.save(f"./res/{file.split(".")[0]}.pdf")
+```
+
+## 环境需求
+
+```
+markdown-pdf
+```
