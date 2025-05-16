@@ -1,0 +1,55 @@
+---
+slug: ExcelMerge
+title: Merge multiple Excel files
+authors: [Castamere]
+---
+
+# Merge multiple Excel files
+
+合并多个 Excel 文件
+
+{/* truncate */}
+
+```python
+import pandas as pd
+import os
+
+TARGET = [
+    0,
+    5
+]
+
+def read_excel(data_file, target_column):
+    excel = pd.read_excel(data_file, engine='openpyxl')
+    return [excel.iloc[:, i] for i in target_column]
+
+ItersToList = lambda ItersArray, function = lambda x: x: [i for i in map(lambda x: [function(j) for j in x], zip(*ItersArray))]
+ReadData = lambda FILENAME : ItersToList(read_excel(FILENAME, TARGET), lambda x: str(x).strip())
+
+def combine_excels(path: str)-> pd.DataFrame:
+    """
+    合并指定路径下所有xlsx文件，保留第一个文件的表头，其他文件忽略首行
+
+    参数:
+        path(str):包含Excel文件的目录路径
+    返回:
+        pd.DataFrame:合并后的数据表
+    """
+    files = [os.path.join(path, i) for i in os.listdir(path)]
+    data = []
+    for file in files: data += ReadData(file)
+    headers = list(pd.read_excel(files[0]))
+    return pd.DataFrame(data, columns=[headers[i] for i in TARGET])
+
+
+if __name__ == "__main__":
+
+    df = combine_excels("./File")
+    df.to_excel('output.xlsx', index=False)
+```
+
+## 环境需求
+
+```
+pandas
+```
