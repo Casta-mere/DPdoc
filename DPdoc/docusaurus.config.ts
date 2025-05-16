@@ -76,9 +76,9 @@ const config: Config = {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
           position: "left",
-          label: "脚本",
+          label: "代码段",
         },
-        { to: "/blog", label: "指南", position: "left" },
+        { to: "/blog", label: "脚本", position: "left" },
         {
           type: "localeDropdown",
           position: "right",
@@ -97,8 +97,13 @@ const config: Config = {
       copyright: `Copyright © Castamere & LongSong <Br/>`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.vsDark,
+      darkTheme: prismThemes.vsDark,
+      additionalLanguages: ["bash", "latex", "json", "markdown", "python"],
+    },
+    colorMode: {
+      defaultMode: "dark",
+      disableSwitch: false,
     },
   } satisfies Preset.ThemeConfig,
 };
