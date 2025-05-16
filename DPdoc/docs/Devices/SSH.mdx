@@ -1,0 +1,77 @@
+# SSH
+
+使用 SSH 连接设备
+
+:::important 环境需求
+python2
+
+paramiko
+:::
+
+```python title="ssh 连接设备"
+import paramiko
+
+class SSH_dp(object):
+    def __init__(self, ip, port, username, password):
+        """SSH connect """
+        log("Trying to connect %s" % ip)
+        self.ssh_client = paramiko.SSHClient()
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            self.ip = ip
+            self.port = port
+            self.connect = True
+            self.ssh_client.connect(ip, username=username, password=password)
+            self.channel = self.ssh_client.invoke_shell()
+            self.channel.send("show version\n")
+            time.sleep(2)
+            results = self.channel.recv(65535).decode('utf-8')
+            log(results)
+            log(self.ip + ' connect success\n')
+        except paramiko.AuthenticationException:
+            log("Authentication failed for %s!\ncheck ip/username/password!" % ip)
+        except paramiko.SSHException as e:
+            log("SSH connection error for %s: %s" % (ip, e))
+        except Exception as e:
+            log(e)
+            self.connect = False
+            log(self.ip + ' connect fail !\ncheck ip/username/password!')
+            exit(0)
+
+    def excute_cmd(self, cmd):
+        if self.channel.closed:
+            log("SSH channel is closed, reconnecting...")
+            self.reconnect()
+        self.channel.send(cmd + '\n')
+        ssh_shells = ''
+        while True:
+            try:
+                data = self.channel.recv(20480)
+            except:
+                break
+            time.sleep(0.2)
+            ssh_shells += data.decode('utf-8')
+
+            if '<' in ssh_shells.strip() and ssh_shells.strip().endswith('>'):
+                break
+            elif '--More(CTRL+C break)--' in ssh_shells:
+                self.channel.send(' ')
+            elif '%' in ssh_shells:
+                break
+
+        return ssh_shells
+
+    def reconnect(self):
+        log("Reconnecting to %s..." % self.ip)
+        self.ssh_client.connect(self.ip, username=self.username, password=self.password)
+        self.channel = self.ssh_client.invoke_shell()
+        log("Reconnection successful")
+
+    def close(self):
+        if self.channel:
+            self.channel.close()
+        if self.ssh_client:
+            self.ssh_client.close()
+        log('Connection closed successfully')
+
+```

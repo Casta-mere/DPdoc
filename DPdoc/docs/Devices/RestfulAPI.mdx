@@ -1,0 +1,60 @@
+# Restful API
+
+使用 Restful API 连接设备
+
+:::important 环境需求
+python2
+
+pycurl
+:::
+
+```python title="Restful API 连接"
+import cStringIO
+import json
+import pycurl
+
+class Manager:
+
+    def __init__(self, ip, username, password, vsys = "all"):
+        self.ip = ip
+        self.username = username
+        self.password = password
+        self.vsys = vsys
+        self.type = "https"
+        self.base_url = "%(http)s://%(ip)s" % {"http": self.type , "ip": self.ip }
+
+    def request(self, type, url):
+        buf = cStringIO.StringIO()
+        c = pycurl.Curl()
+        c.setopt(c.URL, self.base_url  + url)
+        c.setopt(pycurl.USERPWD, "%s:%s" % (self.username, self.password))
+        c.setopt(c.HTTPHEADER, ["Content-Type:application/json", "Accept:application/json", "Expect:"])
+        c.setopt(c.CONNECTTIMEOUT, TIMEOUT)
+        c.setopt(c.TIMEOUT, TIMEOUT)
+        c.setopt(c.WRITEFUNCTION, buf.write)
+        c.setopt(c.SSL_VERIFYPEER, 0)
+        c.setopt(c.SSL_VERIFYHOST, 0)
+        c.setopt(c.CUSTOMREQUEST, type)
+        try:
+            c.perform()
+        except Exception as e:
+            print(e)
+            return 500, None
+
+        status_code = c.getinfo(pycurl.HTTP_CODE)
+
+        if status_code != 200:
+            return status_code, None
+
+        buf_value = buf.getvalue()
+        if not buf_value:
+            c.close()
+            buf.close()
+            return status_code, None
+
+        tmp = json.loads(buf_value, object_pairs_hook=OrderedDict)
+        d = json.dumps(tmp, indent=4)
+        c.close()
+        buf.close()
+        return status_code, json.loads(d)
+```
