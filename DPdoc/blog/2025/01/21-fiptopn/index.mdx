@@ -1,0 +1,47 @@
+---
+slug: fiptopn
+title: Floating IP topn
+authors: [Castamere, LongSong]
+---
+
+# Floating IP topn
+
+IPV4 使用 ssh 连接至设备，使用 show session topn 等命令获取会话，再在数据库中匹配浮动 IP
+
+{/* truncate */}
+
+## 环境
+
+```
+paramiko == 2.12.0
+pycurl == 7.43.0.3
+pymysql == 0.10.1
+sqlalchemy == 1.2.19
+```
+
+点击下载 [env](./env/requirements.tar.gz)
+
+## 排查问题
+
+- sql 版本过老，导致 tx_isolation/transaction_isolation 问题
+  找到 python2.7/site-packages/sqlalchemy/dialects/mysql/base.py 互换
+
+## Crontab 部署
+
+路径 /home/deployer/RG_Check/DP/，每天凌晨 4 点运行
+
+```
+0 4 * * * cd /home/deployer/RG_Check/DP/fip_topn && python fip_topn.py
+```
+
+## 版本
+
+- [V1.1](./version/fip_topn_V1.1.py) : 删除 keystone 相关内容
+- [V1.2](./version/fip_topn_V1.2.py) : 添加 CPU 相关内容
+- [V1.3](./version/fip_topn_V1.3.py) : 修改获取 plugin conf 的匹配内容为 ['external_', 'dptechnology']
+- [V1.4](./version/fip_topn_V1.4.py) : 修改 MySql Connection 获取方式
+- [V2.0](./version/fip_topn_V2.0.py) : 提高兼容性
+- [V2.1](./version/fip_topn_V2.1.py) : 重新使用 keystone
+- [V2.2](./version/fip_topn_V2.2.py) : 再次删除 keystone, 最终获取 project_id
+- [V3.0](./version/fip_topn_V3.0.py) : 现网部署版本，添加部分 log，修改 config 读取
+- [V3.1](./version/fip_topn_V3.1.py) : 部署版本，修改框式设备获取逻辑，所有 log 不再打印
