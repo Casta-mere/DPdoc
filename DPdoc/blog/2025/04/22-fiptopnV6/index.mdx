@@ -1,0 +1,56 @@
+---
+slug: fiptopnV6
+title: Floating IP topn V6
+authors: [Castamere, LongSong]
+---
+
+# Floating IP topn V6
+
+IPV6 使用 Restful 接口连接至设备，获取所有 session 后，进行排序
+
+当前版本支持根据不同 vsys 获取
+
+{/* truncate */}
+
+## 下载
+
+[fip_topnV6](./distribute/dist.zip)
+
+## 环境
+
+```
+pycurl == 7.43.0.3
+```
+
+## 配置文件
+
+```ini
+[DEFAULT]
+user = admin
+password = admin_default
+
+[CMDB]
+agent_dpfw = "10.136.48.194"
+vsys = "all"
+```
+
+- user: 设备用户名
+- password: 设备密码
+- agent_dpfw: 设备 ip
+- vsys: 虚拟系统，设置为 "all" 则获取全部虚拟系统，也可设置为单个虚拟系统，如 vsys = "Re28bf705b1ad4a2f80484d87bb1b44cc"
+
+## 使用说明
+
+使用方法
+
+### Windows
+
+将 config.ini, fip_v6.exe 放于同目录下，修改 config.ini 后点击 fip_v6.exe 即可使用
+
+### Linux
+
+将 config.ini, fip_v6 放于同目录下，修改 config.ini 后，切换到该目录下使用 `./fip_v6` 命令即可
+
+## 版本
+
+- V1.1: 增加 3 次超时重试，每次 5s
